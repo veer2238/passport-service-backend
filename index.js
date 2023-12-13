@@ -83,6 +83,60 @@ app.post('/', async (req, res) => {
     console.error('Attendance Error:', error);
     res.status(500).json({ success: false, error: 'Failed to add attendance record' });
   }
+
+
+  try {
+    let transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: 'veer2238rajput@gmail.com',
+        pass: 'jeasqtbfommzmxya'
+      },
+    });
+
+  
+
+    let info = await transporter.sendMail({
+      from: 'veer2238rajput@gmail.com',
+      to: "himanshu0409agraval@gmail.com",
+      subject: `${req.body.name}`,
+       html: `
+       <p>Hi I Am  ${req.body.name},</p>
+      
+    
+       <p><strong>Attendance Date:</strong> ${req.body.date}</p>
+       <p><strong>My work / Reason:</strong> ${req.body.work}</p>
+
+       <img src="https://i.ibb.co/gyh8tYH/Untitled.png" alt="Thank You Image" style="max-width: 100%; height: auto;">
+       
+       <p>Best regards,</p>
+       <p>V-Ex Tech Solution</p>
+       <p>301,DHUN COMPLEX,ABOVE</p>
+       <p>RIYA BRIDAL,NIZAMPURA MAIN ROAD</p>
+       <p>NEAR AMRITSARI KULCHA</p>
+       <p>VADODARA,GUJARAT-390002.</p>
+       <p>v-extechsolution.in</p>
+
+   `
+
+    });
+
+
+
+   
+
+    console.log("Message sent: %s", info.messageId);
+
+   // Respond with success
+   
+   res.status(200).json({ success: true, message: 'Email sent successfully' });
+  } catch (error) {
+    console.error('Attendance Error:', error);
+    res.status(500).json({ success: false, error: 'Failed to send email' });
+  }
+
 });
 
 
