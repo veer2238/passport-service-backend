@@ -1,74 +1,74 @@
+// index.js
 import express from "express";
-import cors from "cors"
+import cors from "cors";
 import bodyParser from "body-parser";
-import nodemailer from "nodemailer"
-import mongoose  from "mongoose";
+import nodemailer from "nodemailer";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 
-const app = express()
-// Replace the following with your Atlas connection string                                                                                                                                        
-mongoose.connect("mongodb+srv://veer2238rajput:STrgrNlEXyfMZHBs@cluster0.3chkue4.mongodb.net/Contact?retryWrites=true&w=majority")
-.then(() => console.log("mongodb connected"))
-.catch(err => console.log("mongo error",err))
+dotenv.config();
 
-//create schemaa 
-const attendaceSchema = new mongoose.Schema({ 
-  name: { 
-      type: String, 
-      require: true
-  }, 
-  date: { 
-      type: String, 
-      require: true
-  }, 
-  work: { 
-    type: String, 
-    require: true
-}, 
-}) 
+const app = express();
 
-const contactSchema = new mongoose.Schema({ 
-  name: { 
-      type: String, 
-      require: true
-  }, 
-  email: { 
-      type: String, 
-      require: true
-  }, 
-  phone: { 
-    type: String, 
-    require: true
-}, 
-message: { 
-  type: String, 
-  require: true
-}, 
-}) 
+mongoose
+  .connect(
+    "mongodb+srv://veer2238rajput:STrgrNlEXyfMZHBs@cluster0.3chkue4.mongodb.net/Contact?retryWrites=true&w=majority"
+  )
+  .then(() => console.log("mongodb connected"))
+  .catch((err) => console.log("mongo error", err));
 
-const User = new mongoose.model("Attend", attendaceSchema) 
-const ContactUser = new mongoose.model("Contact", contactSchema) 
-  
+const attendaceSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    require: true,
+  },
+  date: {
+    type: String,
+    require: true,
+  },
+  work: {
+    type: String,
+    require: true,
+  },
+});
 
+const contactSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    require: true,
+  },
+  email: {
+    type: String,
+    require: true,
+  },
+  phone: {
+    type: String,
+    require: true,
+  },
+  message: {
+    type: String,
+    require: true,
+  },
+});
+
+const User = mongoose.model("Attend", attendaceSchema);
+const ContactUser = mongoose.model("Contact", contactSchema);
 
 app.use(cors());
 app.use(bodyParser.json());
 
-// Connect to your Atlas cluster
-
-
-
-app.post('/', async (req, res) => {
+app.post("/", async (req, res) => {
   const { name, date, work } = req.body;
 
-  // Check if the attendance record already exists
   const existingRecord = await User.findOne({ name, date });
 
   if (existingRecord) {
-    return res.status(400).json({ success: false, error: 'Your record already exists' });
+    return res
+      .status(400)
+      .json({ success: false, error: "Your record already exists" });
   }
 
   try {
-    // If the record doesn't exist, create a new one
     const result = await User.create({
       name,
       date,
@@ -78,102 +78,79 @@ app.post('/', async (req, res) => {
     console.log(result);
 
     // Send success response
-    res.status(200).json({ success: true, message: 'Attendance record added successfully' });
-  } catch (error) {
-    console.error('Attendance Error:', error);
-    res.status(500).json({ success: false, error: 'Failed to add attendance record' });
-  }
+    res
+      .status(200)
+      .json({ success: true, message: "Attendance record added successfully" });
 
-
-  try {
-    let transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
+    // Send email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
       auth: {
-        user: 'veer2238rajput@gmail.com',
-        pass: 'jeasqtbfommzmxya'
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 
-  
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: "himanshu0409agraval@gmail.com", // Replace with the recipient's email
+      subject: "New Attendance Record",
+      html: `
+        <p>Hello,</p>
+        <p>A new attendance record has been added:</p>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Date:</strong> ${date}</p>
+        <p><strong>Work:</strong> ${work}</p>
+        <p>Best regards,</p>
+        <p>V-Ex Tech Solution</p>
+      `,
+    };
 
-    let info = await transporter.sendMail({
-      from: 'veer2238rajput@gmail.com',
-      to: "himanshu0409agraval@gmail.com",
-      subject: `${req.body.name}`,
-       html: `
-       <p>Hi I Am  ${req.body.name},</p>
-      
-    
-       <p><strong>Attendance Date:</strong> ${req.body.date}</p>
-       <p><strong>My work / Reason:</strong> ${req.body.work}</p>
-
-       <img src="https://i.ibb.co/gyh8tYH/Untitled.png" alt="Thank You Image" style="max-width: 100%; height: auto;">
-       
-       <p>Best regards,</p>
-       <p>V-Ex Tech Solution</p>
-       <p>301,DHUN COMPLEX,ABOVE</p>
-       <p>RIYA BRIDAL,NIZAMPURA MAIN ROAD</p>
-       <p>NEAR AMRITSARI KULCHA</p>
-       <p>VADODARA,GUJARAT-390002.</p>
-       <p>v-extechsolution.in</p>
-
-   `
-
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Email Error:", error);
+      } else {
+        console.log("Email sent:", info.response);
+      }
     });
-
-
-
-   
-
-    console.log("Message sent: %s", info.messageId);
-
-   // Respond with success
-   
-   res.status(200).json({ success: true, message: 'Email sent successfully' });
   } catch (error) {
-    console.error('Attendance Error:', error);
-    res.status(500).json({ success: false, error: 'Failed to send email' });
+    console.error("Attendance Error:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to add attendance record" });
   }
-
 });
 
+app.post("/contact", async (req, res) => {
+  const body = req.body;
 
-  app.post('/contact', async (req, res) => {
+  const result = await ContactUser.create({
+    name: body.name,
+    email: body.email,
+    phone: body.phone,
+    message: body.message,
+  });
 
+  console.log(result);
 
-    const body = req.body;
-    const result = await ContactUser.create({
-      name:body.name,
-      email:body.email,
-      phone:body.phone,
-      message:body.message,
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-    })
-  console.log(result)
-    try {
-      let transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
-        auth: {
-          user: 'veer2238rajput@gmail.com',
-          pass: 'jeasqtbfommzmxya'
-        },
-      });
-  
-    
-  
-      let info = await transporter.sendMail({
-        from: 'veer2238rajput@gmail.com',
-        to: req.body.email,
-        cc:'himanshu0409@gmail.com',
-        subject: "thanks for Contacting at V-Ex Tech Solution",
-         html: `
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: req.body.email,
+      cc: "himanshu0409agraval@gmail.com",
+      subject: "Thanks for Contacting at V-Ex Tech Solution",
+      html: `
          <p>Hi ${req.body.name},</p>
          <p>Thank you for contacting V-Ex Tech Solution. We have received your query and will get back to you soon.</p>
-         <p>we have Your contact details:</p>
+         <p>We have your contact details:</p>
          <p><strong>Email:</strong> ${req.body.email}</p>
          <p><strong>Phone:</strong> ${req.body.phone}</p>
 
@@ -181,33 +158,29 @@ app.post('/', async (req, res) => {
          <p>In the meantime, feel free to call us at +91 9664768292. We look forward to assisting you!</p>
          <p>Best regards,</p>
          <p>V-Ex Tech Solution</p>
-         <p>301,DHUN COMPLEX,ABOVE</p>
-         <p>RIYA BRIDAL,NIZAMPURA MAIN ROAD</p>
+         <p>301, DHUN COMPLEX, ABOVE</p>
+         <p>RIYA BRIDAL, NIZAMPURA MAIN ROAD</p>
          <p>NEAR AMRITSARI KULCHA</p>
-         <p>VADODARA,GUJARAT-390002.</p>
+         <p>VADODARA, GUJARAT-390002.</p>
          <p>v-extechsolution.in</p>
+     `,
+    });
 
-     `
+    console.log("Message sent:", info.messageId);
 
-      });
+    res
+      .status(200)
+      .json({ success: true, message: "Email sent successfully" });
+  } catch (error) {
+    console.error("Contact Error:", error);
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to send email" });
+  }
+});
 
+const port = 9000;
 
-
-     
-  
-      console.log("Message sent: %s", info.messageId);
-  
-     // Respond with success
-     
-     res.status(200).json({ success: true, message: 'Email sent successfully' });
-    } catch (error) {
-      console.error('Attendance Error:', error);
-      res.status(500).json({ success: false, error: 'Failed to send email' });
-    }
-  });
-
-const port =9000
-
-app.listen(port,() =>{
-    console.log("server connected")
-})
+app.listen(port, () => {
+  console.log("server connected");
+});
