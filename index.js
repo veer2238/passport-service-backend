@@ -182,5 +182,5 @@ app.post("/contact", async (req, res) => {
 const port = 9000;
 
 app.listen(port, () => {
-  console.log("server connected");
+  console.log("server connected")
 });
