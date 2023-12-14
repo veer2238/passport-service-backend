@@ -179,6 +179,32 @@ app.post("/contact", async (req, res) => {
   }
 });
 
+
+
+app.get("/attendance", async (req, res) => {
+  try {
+    const allAttendanceData = await User.find();
+    res.status(200).json(allAttendanceData);
+  } catch (error) {
+    console.error("Error fetching attendance data:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+app.get("/attendance/search", async (req, res) => {
+  const { name } = req.query;
+
+  try {
+    const result = await User.find({ name: new RegExp(name, "i") });
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Search Error:", error);
+    res.status(500).json({ success: false, error: "Failed to search records" });
+  }
+});
+
 const port = 9000;
 
 app.listen(port, () => {
