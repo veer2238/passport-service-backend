@@ -192,6 +192,19 @@ app.get("/attendance", async (req, res) => {
 });
 
 
+// get contact details
+
+app.get("/enquiry", async (req, res) => {
+  try {
+    const allEnuiryData = await ContactUser.find();
+    res.status(200).json(allEnuiryData);
+  } catch (error) {
+    console.error("Error fetching attendance data:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
 app.get("/attendance/search", async (req, res) => {
   const { name } = req.query;
 
