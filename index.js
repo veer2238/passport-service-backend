@@ -51,6 +51,35 @@ const contactSchema = new mongoose.Schema({
   },
 });
 
+const certiSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  dob: {
+    type: String, // Assuming you want to store Date of Birth as a string
+    required: true,
+  },
+  startDate: {
+    type: String, // Assuming you want to store Start Date as a string
+    required: true,
+  },
+  endDate: {
+    type: String, // Assuming you want to store End Date as a string
+    required: true,
+  },
+  work: {
+    type: String,
+    required: true,
+  },
+  certiId: {
+    type: String,
+    required: true,
+  },
+});
+
+const Certi = mongoose.model('Certificate', certiSchema);
+
 const User = mongoose.model("Attend", attendaceSchema);
 const ContactUser = mongoose.model("Contact", contactSchema);
 
@@ -217,6 +246,58 @@ app.get("/attendance/search", async (req, res) => {
     res.status(500).json({ success: false, error: "Failed to search records" });
   }
 });
+
+
+app.post('/certi', async (req, res) => {
+  const { name, dob, startDate, endDate, work,certiId} = req.body;
+
+  const existingRecord = await Certi.findOne({ name,dob,certiId});
+
+  if (existingRecord) {
+    return res
+      .status(400)
+      .json({ success: false, error: 'Your certi already exists' });
+  }
+
+  try {
+    const result = await Certi.create({
+      name,
+      dob,
+      startDate,
+      endDate,
+      work,
+      certiId
+    });
+
+    console.log(result);
+
+    // Send success response
+    res.status(200).json({
+      success: true,
+      message: 'certi added successfully',
+    });
+
+  } catch (error) {
+    console.error('Certi Error:', error);
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to add certi record' });
+  }
+});
+
+app.get("/certi/search", async (req, res) => {
+  const { name } = req.query;
+
+  try {
+    const result = await Certi.find({ certiId: new RegExp(name, "i") });
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Search Error:", error);
+    res.status(500).json({ success: false, error: "Failed to search records" });
+  }
+});
+
 
 const port = 9000;
 
