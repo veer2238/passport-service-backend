@@ -111,37 +111,7 @@ app.post("/", async (req, res) => {
       .status(200)
       .json({ success: true, message: "Attendance record added successfully" });
 
-    // Send email
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: "himanshu0409agraval@gmail.com", // Replace with the recipient's email
-      subject: "New Attendance Record",
-      html: `
-        <p>Hello,</p>
-        <p>A new attendance record has been added:</p>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Date:</strong> ${date}</p>
-        <p><strong>Work:</strong> ${work}</p>
-        <p>Best regards,</p>
-        <p>V-Ex Tech Solution</p>
-      `,
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("Email Error:", error);
-      } else {
-        console.log("Email sent:", info.response);
-      }
-    });
+   
   } catch (error) {
     console.error("Attendance Error:", error);
     res
@@ -151,18 +121,22 @@ app.post("/", async (req, res) => {
 });
 
 app.post("/contact", async (req, res) => {
-  const body = req.body;
-
+  const {name,email,phone,message} = req.body;
+try{
+  const exist =await ContactUser.findOne({email,message})
+  if(exist){
+    return res.json({success:false,message:'you have already enquired about the same issue'})
+  }
   const result = await ContactUser.create({
-    name: body.name,
-    email: body.email,
-    phone: body.phone,
-    message: body.message,
+    name,
+    email,
+    phone,
+    message
   });
 
   console.log(result);
 
-  try {
+  
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -177,34 +151,40 @@ app.post("/contact", async (req, res) => {
       cc: "himanshu0409agraval@gmail.com",
       subject: "Thanks for Contacting at V-Ex Tech Solution",
       html: `
-         <p>Hi ${req.body.name},</p>
-         <p>Thank you for contacting V-Ex Tech Solution. We have received your query and will get back to you soon.</p>
-         <p>We have your contact details:</p>
-         <p><strong>Email:</strong> ${req.body.email}</p>
-         <p><strong>Phone:</strong> ${req.body.phone}</p>
-
-         <img src="https://i.ibb.co/gyh8tYH/Untitled.png" alt="Thank You Image" style="max-width: 100%; height: auto;">
-         <p>In the meantime, feel free to call us at +91 9664768292. We look forward to assisting you!</p>
-         <p>Best regards,</p>
-         <p>V-Ex Tech Solution</p>
-         <p>301, DHUN COMPLEX, ABOVE</p>
-         <p>RIYA BRIDAL, NIZAMPURA MAIN ROAD</p>
-         <p>NEAR AMRITSARI KULCHA</p>
-         <p>VADODARA, GUJARAT-390002.</p>
-         <p>v-extechsolution.in</p>
-     `,
+        <div style="background-color: #f8f8f8; padding: 20px; font-family: 'Arial', sans-serif; color: #333;">
+          <p style="font-size: 18px; color: #007BFF;">Hi ${req.body.name},</p>
+          <p style="font-size: 16px;">Thank you for contacting V-Ex Tech Solution. We have received your query and will get back to you soon.</p>
+    
+          <div style="margin: 20px 0; padding: 10px; background-color: #fff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+            <p style="font-size: 16px;">We have your contact details:</p>
+            <p style="font-size: 16px; margin-bottom: 5px;"><strong>Email:</strong> ${req.body.email}</p>
+            <p style="font-size: 16px; margin-bottom: 5px;"><strong>Phone:</strong> ${req.body.phone}</p>
+          </div>
+    
+          <img src="https://v-extechsolution.in/static/media/logo.b48612c02e688a28a62f.png" alt="Thank You Image" style="max-width: 100%; height: auto; margin-bottom: 20px;">
+    
+          <p style="font-size: 16px;">In the meantime, feel free to call us at <strong style="color: #007BFF;">+91 9664768292</strong>. We look forward to assisting you!</p>
+    
+          <p style="font-size: 16px; margin-top: 20px;">Best regards,</p>
+          <p style="font-size: 16px;">V-Ex Tech Solution</p>
+          <p style="font-size: 16px;">301, DHUN COMPLEX, ABOVE</p>
+          <p style="font-size: 16px;">RIYA BRIDAL, NIZAMPURA MAIN ROAD</p>
+          <p style="font-size: 16px;">NEAR AMRITSARI KULCHA</p>
+          <p style="font-size: 16px;">VADODARA, GUJARAT-390002.</p>
+          <p style="font-size: 16px;"><a href="https://v-extechsolution.in" style="color: #007BFF;">v-extechsolution.in</a></p>
+        </div>
+      `,
     });
+    
 
     console.log("Message sent:", info.messageId);
+    res.json({success:true,message:'message sent'})
 
-    res
-      .status(200)
-      .json({ success: true, message: "Email sent successfully" });
   } catch (error) {
     console.error("Contact Error:", error);
     res
       .status(500)
-      .json({ success: false, error: "Failed to send email" });
+      .json({ success: false, error: "Failed to send message" });
   }
 });
 
