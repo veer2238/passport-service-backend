@@ -1,21 +1,54 @@
-// index.js
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import nodemailer from "nodemailer";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import multer from "multer";
+import path from "path";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
 
 dotenv.config();
 
 const app = express();
+const port = 9000;
 
+// Connect to MongoDB
 mongoose
   .connect(
     "mongodb+srv://veer2238rajput:STrgrNlEXyfMZHBs@cluster0.3chkue4.mongodb.net/Contact?retryWrites=true&w=majority"
   )
-  .then(() => console.log("mongodb connected"))
-  .catch((err) => console.log("mongo error", err));
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
+
+
+ const fileSchema = new mongoose.Schema({
+  file: {
+    filename: String,
+    path: String,
+    size: Number,
+  },
+  file2: {
+    filename: String,
+    path: String,
+    size: Number,
+  },
+  name: String,
+  mobile: Number,
+  email: String,
+  permanentadd: String,
+  presentadd: String,
+  pincode: String,
+  institutename:String,
+  education:String,
+  currentstatus:String,
+  techopted:String,
+  duration:String,
+  fees:Number,
+  referedby:String,
+  createdAt: { type: Date, default: Date.now }
+});
 
 const attendaceSchema = new mongoose.Schema({
   name: {
@@ -31,6 +64,7 @@ const attendaceSchema = new mongoose.Schema({
     require: true,
   },
 });
+
 
 const contactSchema = new mongoose.Schema({
   name: {
@@ -50,6 +84,7 @@ const contactSchema = new mongoose.Schema({
     require: true,
   },
 });
+
 
 const certiSchema = new mongoose.Schema({
   name: {
@@ -78,13 +113,89 @@ const certiSchema = new mongoose.Schema({
   },
 });
 
-const Certi = mongoose.model('Certificate', certiSchema);
+
+  
+  const File = mongoose.model('File', fileSchema);
+  const Certi = mongoose.model('Certificate', certiSchema);
 
 const User = mongoose.model("Attend", attendaceSchema);
 const ContactUser = mongoose.model("Contact", contactSchema);
+  
+// Multer configuration for file upload
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
 
+const upload = multer({ storage: storage });
+const __dirname = dirname(fileURLToPath(import.meta.url));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(cors());
+
 app.use(bodyParser.json());
+
+// Route for file upload
+// Route for file upload
+app.post('/upload',upload.fields([{ name: 'file', maxCount: 1 }, { name: 'file2', maxCount: 1 }]), async (req, res) => {
+  const { file, file2 } = req.files;
+  const { name,mobile,email,permanentadd,presentadd,pincode,institutename,education,currentstatus,techopted,duration,fees,referedby } = req.body; 
+  const fileData = {
+    filename: file[0].filename,
+    path: file[0].path,
+    size: file[0].size,
+  };
+
+  const file2Data = {
+    filename: file2[0].filename,
+    path: file2[0].path,
+    size: file2[0].size,
+  };
+  const newFile = new File({
+  
+    file: fileData,
+    file2: file2Data,
+    name,
+    mobile,
+    email,
+    permanentadd,
+    presentadd,
+    pincode,
+    institutename,
+    education,
+    currentstatus,
+    techopted,
+    duration,
+    fees,
+    referedby
+  });
+
+  
+  try {
+    await newFile.save();
+    res.send('File uploaded successfully');
+    console.log(newFile);
+  } catch (err) {
+    console.error("Error saving file to database:", err);
+    res.status(500).send("Error saving file to database");
+  }
+});
+
+
+app.get('/api/get-file-data', async (req, res) => {
+  try {
+    const fileData = await File.find(); // Retrieve all file data
+    res.json(fileData);
+  } catch (err) {
+    console.error("Error fetching file data:", err);
+    res.status(500).send("Error fetching file data");
+  }
+});
+
+
 
 app.post("/", async (req, res) => {
   const { name, date, work } = req.body;
@@ -265,22 +376,26 @@ app.post('/certi', async (req, res) => {
   }
 });
 
-app.get("/certi/search", async (req, res) => {
-  const { name } = req.query;
-
+app.post('/certi-details', async(req, res) => {
   try {
-    const result = await Certi.find({ certiId: new RegExp(name, "i") });
+    const { certiid } = req.body;
 
-    res.status(200).json(result);
+    const certiDetails = await Certi.findOne({ certiId:certiid });
+
+    if (!certiDetails) {
+      return res.status(404).json({ success: false, message: 'Certificate details not found' });
+    }
+
+    res.status(200).json({ success: true, data: certiDetails });
   } catch (error) {
-    console.error("Search Error:", error);
-    res.status(500).json({ success: false, error: "Failed to search records" });
+    console.error('Error processing certification ID:', error);
+    res.status(500).json({ success: false, message: 'Failed to process certification ID' });
   }
 });
 
 
-const port = 9000;
 
+// Start the server
 app.listen(port, () => {
-  console.log("server connected")
+  console.log(`Server running on port ${port}`);
 });
