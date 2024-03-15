@@ -140,13 +140,24 @@ app.use(bodyParser.json());
 
 // Route for file upload
 // Route for file upload
-app.post('/upload', async (req, res) => {
-  
+app.post('/upload',upload.fields([{ name: 'file', maxCount: 1 }, { name: 'file2', maxCount: 1 }]), async (req, res) => {
+  const { file, file2 } = req.files;
   const { name,mobile,email,permanentadd,presentadd,pincode,institutename,education,currentstatus,techopted,duration,fees,referedby } = req.body; 
- 
+  const fileData = {
+    filename: file[0].filename,
+    path: file[0].path,
+    size: file[0].size,
+  };
+
+  const file2Data = {
+    filename: file2[0].filename,
+    path: file2[0].path,
+    size: file2[0].size,
+  };
   const newFile = new File({
   
-   
+    file: fileData,
+    file2: file2Data,
     name,
     mobile,
     email,
