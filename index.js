@@ -3,11 +3,8 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import multer from "multer";
 import nodemailer from 'nodemailer';
-import path from "path";
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+
 
 
 
@@ -26,17 +23,7 @@ mongoose
 
 
  const fileSchema = new mongoose.Schema({
-  file: {
-    filename: String,
-    path: String,
-    size: Number,
-  },
-  file2: {
-    filename: String,
-    path: String,
-    size: Number,
-  },
-  name: String,
+ name: String,
   mobile: Number,
   dob: Date,
   email: String,
@@ -50,6 +37,8 @@ mongoose
   duration:String,
   fees:Number,
   referedby:String,
+  photo:String,
+  aadhar:String,
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -124,41 +113,15 @@ const certiSchema = new mongoose.Schema({
 const User = mongoose.model("Attend", attendaceSchema);
 const ContactUser = mongoose.model("Contact", contactSchema);
   
-// Multer configuration for file upload
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({ storage: storage });
-const __dirname = dirname(fileURLToPath(import.meta.url));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(cors());
 
 app.use(bodyParser.json());
 
-app.post('/upload',upload.fields([{ name: 'file', maxCount: 1 }, { name: 'file2', maxCount: 1 }]), async (req, res) => {
-  const { file, file2 } = req.files;
-  const { name,mobile,dob,email,permanentadd,presentadd,pincode,institutename,education,currentstatus,techopted,duration,fees,referedby } = req.body; 
-  const fileData = {
-    filename: file[0].filename,
-    path: file[0].path,
-    size: file[0].size,
-  };
-
-  const file2Data = {
-    filename: file2[0].filename,
-    path: file2[0].path,
-    size: file2[0].size,
-  };
+app.post('/upload', async (req, res) => {
+  const { name,mobile,dob,email,permanentadd,presentadd,pincode,institutename,education,currentstatus,techopted,duration,fees,referedby,photo,aadhar } = req.body; 
+  
   const newFile = new File({
   
-    file: fileData,
-    file2: file2Data,
     name,
     dob,
     mobile,
@@ -172,7 +135,9 @@ app.post('/upload',upload.fields([{ name: 'file', maxCount: 1 }, { name: 'file2'
     techopted,
     duration,
     fees,
-    referedby
+    referedby,
+    photo,
+    aadhar
   });
 
   
