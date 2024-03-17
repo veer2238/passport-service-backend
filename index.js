@@ -327,7 +327,6 @@ app.get("/attendance", async (req, res) => {
 });
 
 
-// get contact details
 
 app.get("/enquiry", async (req, res) => {
   try {
