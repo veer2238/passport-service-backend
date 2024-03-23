@@ -56,6 +56,28 @@ const attendaceSchema = new mongoose.Schema({
     require: true,
   },
 });
+const passportSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  idType: {
+    type: String,
+    required: true,
+    enum: ['aadhar', 'pan', 'passport', 'voter', 'other'], // Ensure the value is one of these options
+  },
+  date: {
+    type: Date,
+    default: Date.now,
+    required: true,
+  },
+  work: {
+    type: String,
+    required: true,
+  },
+});
+
+
 
 
 const contactSchema = new mongoose.Schema({
@@ -112,6 +134,8 @@ const certiSchema = new mongoose.Schema({
 
 const User = mongoose.model("Attend", attendaceSchema);
 const ContactUser = mongoose.model("Contact", contactSchema);
+
+const Passport = mongoose.model('passport', passportSchema);
   
 app.use(cors());
 
@@ -447,7 +471,69 @@ app.post('/birthwish', async(req, res) => {
             
   })
 
+  app.post("/passport", async (req, res) => {
+    const { name,idType, work, } = req.body;
+  
+    const existingRecord = await User.findOne({ name, work });
+  
+    if (existingRecord) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Your record already exists" });
+    }
+  
+    try {
+      const result = await Passport.create({
+        name,
+        idType,
+        work,
+      });
+  
+      console.log(result);
+  
+      // Send success response
+      res
+        .status(200)
+        .json({ success: true, message: "record added successfully" });
+  
+     
+    } catch (error) {
+      console.error("Attendance Error:", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Failed to add attendance record" });
+    }
+  });
 
+  app.post("/passport-delete", async (req, res) => {
+    const { id } = req.body;
+  
+    try {
+      const result = await Passport.findByIdAndDelete({_id:id});
+  
+      if (result) {
+      return  res.json({ success: true, message: "Record deleted successfully" });
+      } else {
+        return res.json({ success: false, message: "Record not found" });
+      }
+    } catch (error) {
+      console.error("Deletion error:", error);
+      res.status(500).json({ success: false, message: "Failed to delete record" });
+    }
+  });
+  
+
+
+
+  app.get("/passport-info", async (req, res) => {
+    try {
+      const PassportData = await Passport.find();
+      res.status(200).json(PassportData);
+    } catch (error) {
+      console.error("Error fetching attendance data:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
 
   // schedule.scheduleJob('0 0 * * 6,0', async () => {
   //   try {
