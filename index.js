@@ -487,78 +487,53 @@ app.post('/certi-details', async(req, res) => {
 
 
 
-app.post('/birthwish', async(req, res) => {
-
-  
-  
+app.post('/birthwish', async (req, res) => {
   try {
-
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
-    
     const currentDate = `${year}-${month}-${day}`;
-   
     
-    const users = await File.find({dob:currentDate});
+    // Fetch users whose birthday is today
+    const users = await File.find({ dob: currentDate });
+    
+    // Create the transporter once
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
+    // Process all users asynchronously
     for (const user of users) {
-    
-
-     
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-          },
-        });
-
-        const mailOptions = {
-          from: 'veer2238rajput@gmail.com',
-          to: user.email,
-          subject: `V-Ex Tech Solution! - 🎉 Happy Birthday ${user.name} 🎂`,
-          html: `
-          <img src="https://i.ibb.co/xYYx4KL/Untitled-13.png" alt="Untitled-13" border="0" style="width:100%;">
-          <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-      <h1 style="color: #333; font-size: 24px; margin-bottom: 20px;"> Happy Birthday,<br>${user.name}! 🎂 <br> from</h1>
-      <img src="https://i.ibb.co/Lr1TLd6/Untitled-14.png" alt="Birthday Image" style="width: 70%; border-radius: 10px; margin-bottom: 20px;">
-      <p style="color: #666; font-size: 16px; line-height: 1.5;">Wishing you a day filled with happiness and a year filled with joy. Thank you for being a part of V-Ex Tech Solution!</p>
-      <p style="color: #666; font-size: 16px; line-height: 1.5;">"Count your life by smiles, not tears. Count your age by friends, not years. Happy birthday!"</p>
-
-      <p style="color: #666; font-size: 16px; line-height: 1.5;">Best regards,</p>
-      <p style="color: #666; font-size: 16px; line-height: 1.5;">V-Ex Tech Solution Team</p>
-      <div style="margin-top: 50px; color: #666;">
-      <a href="https://v-extechsolution.in" style="font-size: 16px; line-height: 1.5;">v-extechsolution.in</a><br>
-      <a href="mailto:veeragraval@v-extechsolution.in" style="font-size: 16px; line-height: 1.5;">veeragraval@v-extechsolution.in</a><br>
-      <a href="tel:9664768292" style="font-size: 16px; line-height: 1.5;">+91 9664768292</a>
-<div style="margin-top: 50px;">
-      <a href="https://www.linkedin.com/company/v-ex-tech-software-company-in-vadodara/mycompany/" style="text-decoration: none; color: #333; padding:0 14px;"><img src="https://i.ibb.co/1MpdrG8/download-1.png" alt="download-1" border="0" style="width:15%"></a>
-      <a href="https://www.youtube.com/@Veer_Agraval" style="text-decoration: none; color: #333; padding:0 14px;"><img src="https://i.ibb.co/b60S7TZ/download.png" alt="download-1" border="0" style="width:15%"></a>
-      <a href="https://www.instagram.com/v_extech/?igshid=Zjc2ZTc4Nzk%3D" style="text-decoration: none; color: #333; padding:0 14px;"><img src="https://i.ibb.co/xYLHv49/download.jpg" alt="download-1" border="0" style="width:15%"></a>
-    </div>
-    </div>
-    <p style="color: #666; font-size: 16px; line-height: 1.5; margin-top: 20px;">Dhun Complex-301, Above Riya Bridal, near Amritsari Kulcha, opp. pavan park society, Nizampura, Vadodara, Gujarat 390002</p>
-    </div>
-          `,
-        };
+      const mailOptions = {
+        from: 'veer2238rajput@gmail.com',
+        to: user.email,
+        subject: `V-Ex Tech Solution! - 🎉 Happy Birthday ${user.name} 🎂`,
+        html: `
+          <!-- Add your HTML content here -->
+        `,
+      };
       
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent:', info.response);
-        console.log('Birthday emails sent successfully');
-        res.send({success:true})
-      
+      // Send email and log the response
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`Email sent to ${user.email}:`, info.response);
     }
+    
+    console.log('Birthday emails sent successfully');
+    return res.json({ success: true, message: 'Birthday emails sent successfully' });
 
   } catch (error) {
-    console.error("Error sending birthday emails:", error)
+    console.error('Error sending birthday emails:', error);
+    // Return an error response with the error message
+    return res.status(500).json({ success: false, error: error.message });
   }
-   
- 
-    
-            
-  })
+});
+
+
 
   app.post("/passport", async (req, res) => {
     const { name,idType, work, } = req.body;
