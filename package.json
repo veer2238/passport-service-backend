@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/nodemailer": "^6.4.15",
     "body-parser": "^1.20.2",
     "corn": "^0.0.1",
     "cors": "^2.8.5",
