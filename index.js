@@ -143,11 +143,11 @@ app.use(cors());
 
 app.use(bodyParser.json());
 
-app.post('/upload', async (req, res) => {
-  const { name,mobile,dob,email,permanentadd,presentadd,pincode,institutename,education,currentstatus,techopted,duration,fees,pendingfees,referedby,photo,aadhar } = req.body; 
-  try {
-  const newFile = new File({
-  
+app.post('/upload', (req, res) => {
+  const { name, mobile, dob, email, permanentadd, presentadd, pincode, institutename, education, currentstatus, techopted, duration, fees, pendingfees, referedby, photo, aadhar } = req.body; 
+  const currentDate = new Date();
+  const formattedDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`;
+  File.create({
     name,
     dob,
     mobile,
@@ -165,22 +165,19 @@ app.post('/upload', async (req, res) => {
     referedby,
     photo,
     aadhar
-  });
+  })
+  .then(File => {
+    console.log(File);
 
-  await newFile.save();
-    console.log(newFile);
-
- 
     // Load existing PDF
     const existingPdfPath = './slip.pdf';
     const existingPdfBytes = fs.readFileSync(existingPdfPath);
-    const pdfDoc = await PDFDocument.load(existingPdfBytes);
-
+    return PDFDocument.load(existingPdfBytes);
+  })
+  .then(pdfDoc => {
     // Modify existing PDF
-    const currentDate = new Date();
-    
-const formattedDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`;
-const duefees = fees-pendingfees
+    const duefees = fees - pendingfees;
+   
     const page = pdfDoc.getPage(0);
     page.drawText(name, { x: 105, y: 538, size: 12, color: rgb(0, 0, 0) });
     page.drawText(formattedDate, { x: 395, y: 542, size: 12, color: rgb(0, 0, 0) });
@@ -190,9 +187,12 @@ const duefees = fees-pendingfees
     page.drawText(duefees.toString(), { x: 490, y: 208, size: 16, color: rgb(0, 0, 0) });
     page.drawText(pendingfees.toString(), { x: 490, y: 177, size: 16, color: rgb(0, 0, 0) });
 
+    return pdfDoc.save();
+  })
+  .then(modifiedPdfBytes => {
 
-    const modifiedPdfBytes = await pdfDoc.save();
-
+   
+ 
     // Send email with modified PDF attachment
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -207,39 +207,38 @@ const duefees = fees-pendingfees
       to: email,
       subject: `Receipt for Your Registration | V-Ex Tech Solution`,
       html: `
-      <div style="background-color: #f3f3f3; padding: 20px;">
+        <div style="background-color: #f3f3f3; padding: 20px;">
           <div style="background-color: #ffffff; border-radius: 10px; padding: 20px;">
-              <p style="color: #333; font-size: 18px;">${name}</p>
-              <p style="color: #333; font-size: 16px;">Thank you for registering with us!</p>
-              <p style="color: #333; font-size: 16px;">Below is your receipt:</p>
-              <hr style="border: 1px solid #ccc;">
-              <div style="margin-top: 20px;">
-                  <p style="color: #333; font-size: 16px;"><strong>Registration Details:</strong></p>
-                  <ul style="list-style-type: none; padding-left: 0;">
-                      <li><strong>Technology:</strong> ${techopted}</li><br>
-                      <li><strong>Amount:</strong> Paid</li><br>
-                      <li><strong>Date:</strong> ${formattedDate}</li>
-                  </ul>
-              </div>
-              <hr style="border: 1px solid #ccc;">
-              <p style="color: #333; font-size: 16px;">If you have any questions or concerns, feel free to contact us.</p>
-              <p style="color: #666; font-size: 16px;">Best regards,</p>
-              <p style="color: #666; font-size: 16px;">V-Ex Tech Solution Team</p>
-              <div style="margin-top: 20px;">
-                  <a href="https://v-extechsolution.in" style="color: #3498db; font-size: 16px;">v-extechsolution.in</a><br><br>
-                  <a href="mailto:veeragraval@v-extechsolution.in" style="color: #3498db; font-size: 16px;">veeragraval@v-extechsolution.in</a><br><br>
-                  <a href="tel:9664768292" style="color: #3498db; font-size: 16px;">+91 9664768292</a>
-              </div>
-              <div style="margin-top: 20px;">
-                  <a href="https://www.linkedin.com/company/v-ex-tech-software-company-in-vadodara/mycompany/" style="text-decoration: none; color: #333; padding:0 14px;"><img src="https://i.ibb.co/1MpdrG8/download-1.png" alt="LinkedIn" style="width: 15%;"></a>
-                  <a href="https://www.youtube.com/@Veer_Agraval" style="text-decoration: none; color: #333; padding:0 14px;"><img src="https://i.ibb.co/b60S7TZ/download.png" alt="YouTube" style="width: 15%;"></a>
-                  <a href="https://www.instagram.com/v_extech/?igshid=Zjc2ZTc4Nzk%3D" style="text-decoration: none; color: #333; padding:0 14px;"><img src="https://i.ibb.co/xYLHv49/download.jpg" alt="Instagram" style="width: 15%;"></a>
-              </div>
-              <p style="color: #666; font-size: 16px; margin-top: 20px;">Dhun Complex-301, Above Riya Bridal, near Amritsari Kulcha, opp. Pavan Park Society, Nizampura, Vadodara, Gujarat 390002</p>
+            <p style="color: #333; font-size: 18px;">${name}</p>
+            <p style="color: #333; font-size: 16px;">Thank you for registering with us!</p>
+            <p style="color: #333; font-size: 16px;">Below is your receipt:</p>
+            <hr style="border: 1px solid #ccc;">
+            <div style="margin-top: 20px;">
+              <p style="color: #333; font-size: 16px;"><strong>Registration Details:</strong></p>
+              <ul style="list-style-type: none; padding-left: 0;">
+                <li><strong>Technology:</strong> ${techopted}</li><br>
+                <li><strong>Amount:</strong> Paid</li><br>
+                <li><strong>Date:</strong> ${formattedDate}</li>
+              </ul>
+            </div>
+            <hr style="border: 1px solid #ccc;">
+            <p style="color: #333; font-size: 16px;">If you have any questions or concerns, feel free to contact us.</p>
+            <p style="color: #666; font-size: 16px;">Best regards,</p>
+            <p style="color: #666; font-size: 16px;">V-Ex Tech Solution Team</p>
+            <div style="margin-top: 20px;">
+              <a href="https://v-extechsolution.in" style="color: #3498db; font-size: 16px;">v-extechsolution.in</a><br><br>
+              <a href="mailto:veeragraval@v-extechsolution.in" style="color: #3498db; font-size: 16px;">veeragraval@v-extechsolution.in</a><br><br>
+              <a href="tel:9664768292" style="color: #3498db; font-size: 16px;">+91 9664768292</a>
+            </div>
+            <div style="margin-top: 20px;">
+              <a href="https://www.linkedin.com/company/v-ex-tech-software-company-in-vadodara/mycompany/" style="text-decoration: none; color: #333; padding:0 14px;"><img src="https://i.ibb.co/1MpdrG8/download-1.png" alt="LinkedIn" style="width: 15%;"></a>
+              <a href="https://www.youtube.com/@Veer_Agraval" style="text-decoration: none; color: #333; padding:0 14px;"><img src="https://i.ibb.co/b60S7TZ/download.png" alt="YouTube" style="width: 15%;"></a>
+              <a href="https://www.instagram.com/v_extech/?igshid=Zjc2ZTc4Nzk%3D" style="text-decoration: none; color: #333; padding:0 14px;"><img src="https://i.ibb.co/xYLHv49/download.jpg" alt="Instagram" style="width: 15%;"></a>
+            </div>
+            <p style="color: #666; font-size: 16px; margin-top: 20px;">Dhun Complex-301, Above Riya Bridal, near Amritsari Kulcha, opp. Pavan Park Society, Nizampura, Vadodara, Gujarat 390002</p>
           </div>
-      </div>
+        </div>
       `,
-
       attachments: [
         {
           filename: 'receipt.pdf',
@@ -248,26 +247,18 @@ const duefees = fees-pendingfees
       ],
     };
 
-    
-
-  
-
-  
- 
-    
-    const info = await transporter.sendMail(mailOptions);
+    return transporter.sendMail(mailOptions);
+  })
+  .then(info => {
     console.log('Email sent:', info.response);
-
-
-   
-
-    res.send('File uploaded successfully');
- 
-  } catch (err) {
-    console.error("Error saving file to database:", err);
-    res.status(500).send("Error saving file to database");
-  }
+    res.send('Registration details have been updated.');
+  })
+  .catch(err => {
+    console.error("Error:", err);
+    res.status(500).send("Error processing request");
+  });
 });
+
 
 
 app.get('/api/get-file-data', async (req, res) => {
@@ -508,15 +499,15 @@ app.post('/birthwish', async (req, res) => {
     });
 
     // Process all users asynchronously
-    for (const user of users) {
+  
       const mailOptions = {
         from: 'veer2238rajput@gmail.com',
-        to: user.email,
-        subject: `V-Ex Tech Solution! - 🎉 Happy Birthday ${user.name} 🎂`,
+        to: 'jalpunpatel95@gmail.com',
+        subject: `V-Ex Tech Solution! - 🎉 Happy Birthday Jalp Patel 🎂`,
         html:  `
         <img src="https://i.ibb.co/xYYx4KL/Untitled-13.png" alt="Untitled-13" border="0" style="width:100%;">
         <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-    <h1 style="color: #333; font-size: 24px; margin-bottom: 20px;"> Happy Birthday,<br>${user.name}! 🎂 <br> from</h1>
+    <h1 style="color: #333; font-size: 24px; margin-bottom: 20px;"> Happy Birthday,<br>Jalp Patel! 🎂 <br> from</h1>
     <img src="https://v-extechsolution.in/static/media/logo.b48612c02e688a28a62f.png" alt="Birthday Image" style="width: 70%; border-radius: 10px; margin-bottom: 20px;">
     <p style="color: #666; font-size: 16px; line-height: 1.5;">Wishing you a day filled with happiness and a year filled with joy. Thank you for being a part of V-Ex Tech Solution!</p>
     <p style="color: #666; font-size: 16px; line-height: 1.5;">"Count your life by smiles, not tears. Count your age by friends, not years. Happy birthday!"</p>
@@ -536,12 +527,12 @@ app.post('/birthwish', async (req, res) => {
   <p style="color: #666; font-size: 16px; line-height: 1.5; margin-top: 20px;">Dhun Complex-301, Above Riya Bridal, near Amritsari Kulcha, opp. pavan park society, Nizampura, Vadodara, Gujarat 390002</p>
   </div>
         `,
-      };
+      }
       
-      // Send email and log the response
+
       const info = await transporter.sendMail(mailOptions);
-      console.log(`Email sent to ${user.email}:`, info.response);
-    }
+      console.log(`Email sent to ${users.email}:`, info.response);
+    
     
     console.log('Birthday emails sent successfully');
     return res.json({ success: true, message: 'Birthday emails sent successfully' });
