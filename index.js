@@ -328,7 +328,7 @@ app.post("/contact", async (req, res) => {
 try{
   const exist =await ContactUser.findOne({email,message})
   if(exist){
-    return res.json({success:false,message:'you have already enquired about the same issue'})
+    return res.json({success:false,error:'you have already enquired about the same issue'})
   }
   const result = await ContactUser.create({
     name,
@@ -350,18 +350,18 @@ try{
 
     const info = await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: req.body.email,
+      to: email,
       cc: "himanshu0409agraval@gmail.com",
       subject: "Thanks for Contacting at V-Ex Tech Solution",
       html: `
         <div style="background-color: #f8f8f8; padding: 20px; font-family: 'Arial', sans-serif; color: #333;">
-          <p style="font-size: 18px; color: #007BFF;">Hi ${req.body.name},</p>
+          <p style="font-size: 18px; color: #007BFF;">Hi ${name},</p>
           <p style="font-size: 16px;">Thank you for contacting V-Ex Tech Solution. We have received your query and will get back to you soon.</p>
     
           <div style="margin: 20px 0; padding: 10px; background-color: #fff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
             <p style="font-size: 16px;">We have your contact details:</p>
-            <p style="font-size: 16px; margin-bottom: 5px;"><strong>Email:</strong> ${req.body.email}</p>
-            <p style="font-size: 16px; margin-bottom: 5px;"><strong>Phone:</strong> ${req.body.phone}</p>
+            <p style="font-size: 16px; margin-bottom: 5px;"><strong>Email:</strong> ${email}</p>
+            <p style="font-size: 16px; margin-bottom: 5px;"><strong>Phone:</strong> ${phone}</p>
           </div>
     
           <img src="https://v-extechsolution.in/static/media/logo.b48612c02e688a28a62f.png" alt="Thank You Image" style="max-width: 100%; height: auto; margin-bottom: 20px;">
@@ -385,10 +385,12 @@ try{
         </div>
       `,
     });
+
+  
     
 
     console.log("Message sent:", info.messageId);
-    res.json({success:true,message:'message sent'})
+    res.json({success:true,message:' Thanks Your message has been sent'})
 
   } catch (error) {
     console.error("Contact Error:", error);
