@@ -496,14 +496,14 @@ app.post('/certi-details', async(req, res) => {
 
 app.post('/birthwish', async (req, res) => {
 
-  const {email} = req.body
+  const {email,name} = req.body
 
-
+// console.log(email+name)
   try {
   
     
     // Fetch users whose birthday is today
-    const users = await File.findOne({email});
+    // const users = await File.findOne({email});
     
     // Create the transporter once
     const transporter = nodemailer.createTransport({
@@ -519,11 +519,11 @@ app.post('/birthwish', async (req, res) => {
       const mailOptions = {
         from: process.env.EMAIL_USER,
         to: email,
-        subject: `V-Ex Tech Solution! - 🎉 Happy Birthday ${users.name} 🎂`,
+        subject: `V-Ex Tech Solution! - 🎉 Happy Birthday ${name} 🎂`,
         html:  `
         <img src="https://i.ibb.co/xYYx4KL/Untitled-13.png" alt="Untitled-13" border="0" style="width:100%;">
         <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-    <h1 style="color: #333; font-size: 24px; margin-bottom: 20px;"> Happy Birthday,<br>${users.name}! 🎂 <br> from</h1>
+    <h1 style="color: #333; font-size: 24px; margin-bottom: 20px;"> Happy Birthday,<br>${name}! 🎂 <br> from</h1>
     <img src="https://v-extechsolution.in/static/media/logo.b48612c02e688a28a62f.png" alt="Birthday Image" style="width: 70%; border-radius: 10px; margin-bottom: 20px;">
     <p style="color: #666; font-size: 16px; line-height: 1.5;">Wishing you a day filled with happiness and a year filled with joy. Thank you for being a part of V-Ex Tech Solution!</p>
     <p style="color: #666; font-size: 16px; line-height: 1.5;">"Count your life by smiles, not tears. Count your age by friends, not years. Happy birthday!"</p>
