@@ -66,7 +66,7 @@ const passportSchema = new mongoose.Schema({
   idType: {
     type: String,
     required: true,
-    enum: ['aadhar', 'pan', 'passport', 'voter', 'other'], // Ensure the value is one of these options
+    enum: ['aadhar', 'pan', 'passport', 'voter','driving','students','other'], // Ensure the value is one of these options
   },
   date: {
     type: Date,
@@ -565,9 +565,9 @@ app.post('/birthwish', async (req, res) => {
 
 
   app.post("/passport", async (req, res) => {
-    const { name,idType, work, } = req.body;
+    const { name,date,idType, work, } = req.body;
   
-    const existingRecord = await User.findOne({ name, work });
+    const existingRecord = await User.findOne({ name, work});
   
     if (existingRecord) {
       return res
@@ -578,6 +578,7 @@ app.post('/birthwish', async (req, res) => {
     try {
       const result = await Passport.create({
         name,
+        date,
         idType,
         work,
       });
@@ -587,7 +588,7 @@ app.post('/birthwish', async (req, res) => {
       // Send success response
       res
         .status(200)
-        .json({ success: true, message: "record added successfully" });
+        .json({ success: true, message: "Thanks record added successfully" });
   
      
     } catch (error) {
