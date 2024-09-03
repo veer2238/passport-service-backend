@@ -689,8 +689,7 @@ app.post('/birthwish', async (req, res) => {
   });
 
   app.post('/verify-payment', async (req, res) => {
-    const { orderId } = req.body;
-  
+    const { orderId, email, name, mobile } = req.body;  
   
     try {
       // Create the PhonePe check status URL
@@ -710,9 +709,31 @@ app.post('/birthwish', async (req, res) => {
         },
       });
   
+    
       // Check the response from PhonePe
       if (data.success && data.code === 'PAYMENT_SUCCESS' && data.data.state === 'COMPLETED') {
         // Perform actions like saving the order, clearing the cart, etc.
+
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+        });
+    
+        // Process all users asynchronously
+      
+          const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: `registration V-Ex Tech Solution`,
+            html:  `Dear ${name},\n\nYour payment of ₹${data.data.amount / 100} was successful via ${mobile}. Your transaction ID is ${data.data.transactionId}. Thank you for your payment.\n\nBest regards,\nV-Ex Tech SOlution`,
+          }
+          
+    
+          const info = await transporter.sendMail(mailOptions);
+          console.log(`Email sent:`, info.response);
         res.json({
           success: true,
           message: 'Payment successful',
