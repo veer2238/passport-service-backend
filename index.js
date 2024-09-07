@@ -635,8 +635,7 @@ app.post('/birthwish', async (req, res) => {
           merchantUserId:email,
           amount: amount*100,
           redirectMode: "REDIRECT",
-          redirectUrl: frontendUrl,
-          // redirectUrl: `${frontendUrl}?orderId=${orderId}`,
+          redirectUrl: `${frontendUrl}?orderId=${orderId}`,
           // callbackUrl: `${frontendUrl}/confirm`,
           // mobileNumber: user.mobile,
           paymentInstrument: {
@@ -689,67 +688,67 @@ app.post('/birthwish', async (req, res) => {
   
   });
 
-  // app.post('/verify-payment', async (req, res) => {
-  //   const { orderId, email, name, mobile } = req.body;  
+  app.post('/verify-payment', async (req, res) => {
+    const { orderId, email, name, mobile } = req.body;  
   
-  //   try {
-  //     // Create the PhonePe check status URL
-  //     const checkStatusUrl = `https://api.phonepe.com/apis/hermes/pg/v1/status/${merchantId}/${orderId}`;
+    try {
+      // Create the PhonePe check status URL
+      const checkStatusUrl = `https://api.phonepe.com/apis/hermes/pg/v1/status/${merchantId}/${orderId}`;
       
-  //     // Generate the X-VERIFY header
-  //     const stringToHash = `/pg/v1/status/${merchantId}/${orderId}${saltKey}`;
-  //     const sha256Hash = crypto.createHash('sha256').update(stringToHash).digest('hex');
-  //     const finalXHeader = `${sha256Hash}###${saltIndex}`;
+      // Generate the X-VERIFY header
+      const stringToHash = `/pg/v1/status/${merchantId}/${orderId}${saltKey}`;
+      const sha256Hash = crypto.createHash('sha256').update(stringToHash).digest('hex');
+      const finalXHeader = `${sha256Hash}###${saltIndex}`;
       
-  //     // Send the request to PhonePe to check the payment status
-  //     const { data } = await axios.get(checkStatusUrl, {
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'X-VERIFY': finalXHeader,
-  //         'X-MERCHANT-ID':merchantId
-  //       },
-  //     });
+      // Send the request to PhonePe to check the payment status
+      const { data } = await axios.get(checkStatusUrl, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-VERIFY': finalXHeader,
+          'X-MERCHANT-ID':merchantId
+        },
+      });
   
     
-  //     // Check the response from PhonePe
-  //     if (data.success && data.code === 'PAYMENT_SUCCESS' && data.data.state === 'COMPLETED') {
-  //       // Perform actions like saving the order, clearing the cart, etc.
+      // Check the response from PhonePe
+      if (data.success && data.code === 'PAYMENT_SUCCESS' && data.data.state === 'COMPLETED') {
+        // Perform actions like saving the order, clearing the cart, etc.
 
-  //       const transporter = nodemailer.createTransport({
-  //         service: 'gmail',
-  //         auth: {
-  //           user: process.env.EMAIL_USER,
-  //           pass: process.env.EMAIL_PASS,
-  //         },
-  //       });
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+        });
     
-  //       // Process all users asynchronously
+        // Process all users asynchronously
       
-  //         const mailOptions = {
-  //           from: process.env.EMAIL_USER,
-  //           to: email,
-  //           subject: `registration V-Ex Tech Solution`,
-  //           html:  `Dear ${name},\n\nYour payment of ₹${data.data.amount / 100} was successful via ${mobile}. Your transaction ID is ${data.data.transactionId}. Thank you for your payment.\n\nBest regards,\nV-Ex Tech SOlution`,
-  //         }
+          const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: `registration V-Ex Tech Solution`,
+            html:  `Dear ${name},\n\nYour payment of ₹${data.data.amount / 100} was successful via ${mobile}. Your transaction ID is ${data.data.transactionId}. Thank you for your payment.\n\nBest regards,\nV-Ex Tech SOlution`,
+          }
           
     
-  //         const info = await transporter.sendMail(mailOptions);
-  //         console.log(`Email sent:`, info.response);
-  //       res.json({
-  //         success: true,
-  //         message: 'Payment successful',
-  //         transactionId: data.data.transactionId, 
-  //         paymentMethod: data.data.paymentInstrument.type, 
-  //         amount: data.data.amount,
-  //       });
-  //     } else {
-  //       res.json({ success: false, message: 'Payment failed or not completed.' });
-  //     }
-  //   } catch (error) {
-  //     console.error('Error verifying payment:', error);
-  //     res.status(500).json({ success: false, error: error.message });
-  //   }
-  // });
+          const info = await transporter.sendMail(mailOptions);
+          console.log(`Email sent:`, info.response);
+        res.json({
+          success: true,
+          message: 'Payment successful',
+          transactionId: data.data.transactionId, 
+          paymentMethod: data.data.paymentInstrument.type, 
+          amount: data.data.amount,
+        });
+      } else {
+        res.json({ success: false, message: 'Payment failed or not completed.' });
+      }
+    } catch (error) {
+      console.error('Error verifying payment:', error);
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
 
 
   app.get("/passport-info", async (req, res) => {
