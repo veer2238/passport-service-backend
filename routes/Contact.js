@@ -83,5 +83,15 @@ app.post("/contact", async (req, res) => {
     }
   });
 
+  app.get("/enquiry", async (req, res) => {
+    try {
+      const allEnuiryData = await ContactUser.find();
+      res.status(200).json(allEnuiryData);
+    } catch (error) {
+      console.error("Error fetching attendance data:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+
   module.exports=app
 

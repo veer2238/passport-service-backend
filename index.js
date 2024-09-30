@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import axios from 'axios'
-import Contacroute from './routes/Contact'
+import Contactroute from './routes/Contact'
 
 
 
@@ -133,7 +133,7 @@ const Passport = mongoose.model('passport', passportSchema);
   
 app.use(cors());
 
-app.use('/',Contacroute)
+app.use('/',Contactroute)
 
 app.use(bodyParser.json());
 
@@ -333,15 +333,7 @@ app.get("/attendance", async (req, res) => {
 
 
 
-app.get("/enquiry", async (req, res) => {
-  try {
-    const allEnuiryData = await ContactUser.find();
-    res.status(200).json(allEnuiryData);
-  } catch (error) {
-    console.error("Error fetching attendance data:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
+
 
 
 app.get("/attendance/search", async (req, res) => {
