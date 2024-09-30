@@ -1,4 +1,4 @@
-import ContactUser from '../models/Contact'
+import ContactUser from '../models/Contact.js'
 import express from "express";
 import dotenv from "dotenv";
 import nodemailer from 'nodemailer';
@@ -93,5 +93,5 @@ app.post("/contact", async (req, res) => {
     }
   });
 
-  module.exports=app
+  export default app
 
