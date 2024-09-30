@@ -15,6 +15,8 @@ import Contactroute from './routes/Contact.js';
 dotenv.config();
 
 const app = express();
+app.use(express.json());
+
 const port = 9000;
 
 // Connect to MongoDB
@@ -130,7 +132,6 @@ const User = mongoose.model("Attend", attendaceSchema);
 
 
 const Passport = mongoose.model('passport', passportSchema);
-  
 app.use(cors());
 
 app.use('/',Contactroute)
