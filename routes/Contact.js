@@ -97,5 +97,26 @@ app.post("/contact", async (req, res) => {
     }
   });
 
+
+  app.post("/enquiry-delete", async (req, res) => {
+    const {id} = req.body;
+    console.log(id)
+  try{
+    const deletedEnquiry = await ContactUser.findByIdAndDelete({_id:id});
+
+    if (deletedEnquiry) {
+      res.json({ success: true, message: 'Enquiry deleted successfully' });
+    } else {
+      res.status(404).json({ success: false, error: "Enquiry not found" });
+    }
+  
+    } catch (error) {
+      console.error("Contact Error:", error);
+      res
+        .status(500)
+        .json({ success: false, error: "Failed to send message" });
+    }
+  });
+
   export default app
 
