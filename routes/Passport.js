@@ -1,5 +1,6 @@
 import express from "express";
 import Passport from "../models/Passport.js";
+import Passportfile from "../models/Passportfile.js";
 
 const app = express();
 
@@ -46,6 +47,23 @@ app.post("/passport", async (req, res) => {
   
     try {
       const result = await Passport.findByIdAndDelete({_id:id});
+  
+      if (result) {
+      return  res.json({ success: true, message: "Record deleted successfully" });
+      } else {
+        return res.json({ success: false, message: "Record not found" });
+      }
+    } catch (error) {
+      console.error("Deletion error:", error);
+      res.status(500).json({ success: false, message: "Failed to delete record" });
+    }
+  });
+
+  app.post("/passportfile-delete", async (req, res) => {
+    const { id } = req.body;
+  
+    try {
+      const result = await Passportfile.findByIdAndDelete({_id:id});
   
       if (result) {
       return  res.json({ success: true, message: "Record deleted successfully" });
@@ -130,6 +148,33 @@ app.post("/passport", async (req, res) => {
     }
   });
 
+  app.post("/passport-file", async (req, res) => {
+    const {id, name, work,date } = req.body
+  
+    try {
+
+      const save = await Passportfile.create({
+        name,appointmentdate:date,work
+      })
+
+      console.log(save)
+
+     
+      const result = await Passport.findByIdAndDelete({ _id: id });
+  
+      if (result) {
+        console.log(result)
+        return res.json({ success: true, message: "Record sent successfully"});
+      } else {
+        return res.json({ success: false, message: "Record not found" });
+      }
+    } catch (error) {
+      console.error("Update error:", error);
+      res.status(500).json({ success: false, message: "Failed to update record" });
+    }
+  });
+
+
 
   app.get("/passport-info", async (req, res) => {
     try {
@@ -138,6 +183,40 @@ app.post("/passport", async (req, res) => {
     } catch (error) {
       console.error("Error fetching attendance data:", error);
       res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+
+  app.get("/passportfile-info", async (req, res) => {
+    try {
+      const PassportData = await Passportfile.find();
+      res.status(200).json(PassportData);
+    } catch (error) {
+      console.error("Error fetching attendance data:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+
+
+  app.post("/passportfile-update", async (req, res) => {
+    const {id,name,work,appointmentdate, username,password,Fileno,Filestatus} = req.body
+  
+    try {
+     
+      const result = await Passportfile.findByIdAndUpdate(
+        { _id: id }, 
+        { name,work,appointmentdate, username,password,Fileno,Filestatus }, 
+        { new: true }
+      );
+  
+      if (result) {
+        console.log(result)
+        return res.json({ success: true, message: "Record Updated successfully"});
+      } else {
+        return res.json({ success: false, message: "Record not found" });
+      }
+    } catch (error) {
+      console.error("Update error:", error);
+      res.status(500).json({ success: false, message: "Failed to update record" });
     }
   });
 
