@@ -29,7 +29,7 @@ app.use('/',Birthroute)
 
 
 
-// Connect to MongoDB
+
 mongoose
   .connect(
     "mongodb+srv://veer2238rajput:STrgrNlEXyfMZHBs@cluster0.3chkue4.mongodb.net/Contact?retryWrites=true&w=majority"
