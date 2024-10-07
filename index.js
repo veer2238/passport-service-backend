@@ -8,6 +8,7 @@ import Payroute from './routes/Payment.js'
 import Passportroute from './routes/Passport.js'
 import Fileroute from './routes/File.js'
 import Birthroute from './routes/Birthday.js'
+import Task from './routes/TaskRegister.js'
  
 
 
@@ -22,6 +23,7 @@ app.use('/',Attendancetroute)
 app.use('/',Certiroute)
 app.use('/',Payroute)
 app.use('/',Passportroute)
+app.use('/',Task)
 app.use('/',Fileroute)
 app.use('/',Birthroute)
 
