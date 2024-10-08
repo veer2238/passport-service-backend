@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import Contactroute from './routes/Contact.js';
-import Attendancetroute from './routes/Attendance.js';
+import Attendancetroute from './routes/Attendance.js'
 import Certiroute from './routes/Certi.js'
 import Payroute from './routes/Payment.js'
 import Passportroute from './routes/Passport.js'
