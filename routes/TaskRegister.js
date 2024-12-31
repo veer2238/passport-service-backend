@@ -1,26 +1,11 @@
 import TaskRegister from "../models/TaskRegister.js";
-// import admin from 'firebase-admin';
-// import path from 'path';
-// import { fileURLToPath } from 'url';
-// import fs from 'fs';
+
 import express from "express";
 const app = express();
 
-// Get current file and directory name
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
 
-// Read the service account key JSON file
-// const serviceAccountPath = path.join(__dirname, '../otpp.json');
-// const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
 
-// Initialize Firebase Admin SDK
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount),
-//   databaseURL: 'https://veer-consultancy-d805f-default-rtdb.firebaseio.com/'
-// });
 
-app.use(express.json()); // Ensure body parsing middleware is included
 
 // Task register route
 app.post("/task-register", async (req, res) => {
