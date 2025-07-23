@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registration Confirmation</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f5f8fc;
+      font-family: Arial, sans-serif;
+      color: #222;
+    }
+    .container {
+      max-width: 640px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+    h2 {
+      color: #0055a5;
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+    p, li {
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+    hr {
+      border: 0;
+      border-top: 1px solid #ddd;
+      margin: 24px 0;
+    }
+    .highlight {
+      font-weight: bold;
+      color: #007acc;
+    }
+    .info-section {
+      background-color: #f0f6fc;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 12px;
+    }
+    .contact a {
+      color: #007acc;
+      text-decoration: none;
+      margin-bottom: 8px;
+    }
+    .socials {
+      margin-top: 16px;
+      
+      
+     
+      font-size: 14px;
+    }
+    .socials a {
+      color: #0055a5;
+      text-decoration: none;
+      margin-bottom: 10px;
+    }
+    .footer {
+      font-size: 12px;
+      color: #777;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p>Dear <span class="highlight">{{name}}</span>,</p>
+
+    <p>Thank you for registering for our internship program at <strong>V-Ex Tech Solution</strong>. We’re excited to receive your application!</p>
+
+    <p>
+      ✔️ Your registration has been received and is now under admin review.<br>
+      You will receive an approval confirmation and offer letter soon.
+    </p>
+
+    <hr>
+
+    <h2> Registration Summary</h2>
+    <div class="info-section">
+      <ul>
+        <li><strong>Student Name:</strong> {{name}}</li>
+        <li><strong>Technology:</strong> {{techopted}}</li>
+        <li><strong>Duration:</strong> {{duration}}</li>
+        <li><strong>Total Fees:</strong> ₹{{fees}}</li>
+        <li><strong>Paid:</strong> ₹{{paidfees}}</li>
+        <li><strong style="color: red;">Pending:</strong> ₹{{pendingfees}}</li>
+        <li><strong>Date:</strong> {{formattedDate}}</li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <h2>📑 Documents Required</h2>
+    <p>Please keep the following documents ready for upload:</p>
+    <ul>
+      <li>College ID Card</li>
+      <li>Aadhar Card</li>
+      <li>Passport Size Photo</li>
+    </ul>
+
+    <p>If you have any questions, feel free to reply to this email or contact us.</p>
+
+    <p>Warm regards,<br><strong>V-Ex Tech Solution Team</strong></p>
+
+    <div class="contact" style="font-size: 14px; margin-top: 16px;">
+       Website: <a href="https://v-extechsolution.in">v-extechsolution.in</a><br>
+      Email: <a href="mailto:veeragraval@v-extechsolution.in">hrteam@v-extechsolution.in</a><br>
+       Helpline: <a href="tel:+919664768292">+91 96647 68292</a>
+    </div>
+
+    <div class="socials">
+      <a href="https://www.linkedin.com/company/v-ex-tech-software-company-in-vadodara/mycompany/"> LinkedIn</a>
+      <a href="https://www.youtube.com/@Veer_Agraval"> YouTube</a>
+      <a href="https://www.instagram.com/v_extech/"> Instagram</a>
+    </div>
+
+    <div class="footer">
+      Address: Dhun Complex-301, Above Riya Bridal, near Amritsari Kulcha,<br>
+      Opp. Pavan Park Society, Nizampura, Vadodara, Gujarat 390002
+    </div>
+  </div>
+</body>
+</html>
