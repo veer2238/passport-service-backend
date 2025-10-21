@@ -105,14 +105,15 @@ app.post('/create-payment', async (req, res) => {
       if (data.success && data.code === 'PAYMENT_SUCCESS' && data.data.state === 'COMPLETED') {
         // Perform actions like saving the order, clearing the cart, etc.
 
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-          },
-        });
-    
+       const transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: process.env.SMTP_PORT,
+            secure: true,
+            auth: {
+              user: process.env.EMAIL_USER,
+              pass: process.env.EMAIL_PASS,
+            },
+          });
         // Process all users asynchronously
       
           const mailOptions = {

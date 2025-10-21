@@ -12,6 +12,7 @@ const app = express();
 
 app.post("/contact", async (req, res) => {
     const {name,email,phone,message} = req.body;
+    console.log(name,email,phone,message)
   try{
     const exist =await ContactUser.findOne({email,message})
     if(exist){
