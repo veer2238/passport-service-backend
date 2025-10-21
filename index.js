@@ -9,6 +9,7 @@ import Passportroute from './routes/Passport.js'
 import Fileroute from './routes/File.js'
 import Birthroute from './routes/Birthday.js'
 import Task from './routes/TaskRegister.js'
+import Subscribe from './routes/Subscribe.js'
  
 
 
@@ -26,6 +27,7 @@ app.use('/',Passportroute)
 app.use('/',Task)
 app.use('/',Fileroute)
 app.use('/',Birthroute)
+app.use('/',Subscribe)
 
 
 
