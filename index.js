@@ -10,10 +10,10 @@ import Fileroute from './routes/File.js'
 import Birthroute from './routes/Birthday.js'
 import Task from './routes/TaskRegister.js'
 import Subscribe from './routes/Subscribe.js'
- 
+import dotenv from "dotenv";
 
 
-
+dotenv.config();
 const app = express();
 app.use(express.json());
 
