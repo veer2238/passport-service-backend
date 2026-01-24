@@ -5,7 +5,6 @@ import Contactroute from './routes/Contact.js';
 import Attendancetroute from './routes/Attendance.js'
 import Certiroute from './routes/Certi.js'
 import Payroute from './routes/Payment.js'
-import Passportroute from './routes/Passport.js'
 import Fileroute from './routes/File.js'
 import Birthroute from './routes/Birthday.js'
 import Task from './routes/TaskRegister.js'
@@ -23,7 +22,6 @@ app.use('/',Contactroute)
 app.use('/',Attendancetroute)
 app.use('/',Certiroute)
 app.use('/',Payroute)
-app.use('/',Passportroute)
 app.use('/',Task)
 app.use('/',Fileroute)
 app.use('/',Birthroute)
@@ -39,12 +37,7 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// mongoose
-//   .connect(
-//     "mongodb+srv://veer04agraval:mRU37WQcT8udQc7n@cluster0.lnugf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-//   )
-//   .then(() => console.log("MongoDB connected"))
-//   .catch((err) => console.error("MongoDB connection error:", err));
+
 
 
 

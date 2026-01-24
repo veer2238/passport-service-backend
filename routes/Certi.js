@@ -7,7 +7,7 @@ const app = express();
 app.post('/certi', async (req, res) => {
     const { name, work,certiId} = req.body;
   
-    const existingRecord = await Certi.findOne({ name,certiId});
+    const existingRecord = await Certi.findOne({ certiId});
   
     if (existingRecord) {
       return res
@@ -34,7 +34,7 @@ app.post('/certi', async (req, res) => {
       console.error('Certi Error:', error);
       res
         .status(500)
-        .json({ success: false, message: 'Failed to add certi record' });
+        .json({ success: false, error: 'Failed to add certi record' });
     }
   });
   
