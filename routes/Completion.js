@@ -351,13 +351,13 @@ app.post("/completion", async (req, res) => {
       const certiDetails = await Completion.findOne({ certiId:certiid });
   
       if (!certiDetails) {
-        return res.status(404).json({ success: false, message: 'Certificate details not found' });
+        return res.json({ success: false, message: 'Certificate details not found' });
       }
   
-      res.status(200).json({ success: true, data: certiDetails });
+      res.json({ success: true, data: certiDetails });
     } catch (error) {
       console.error('Error processing certification ID:', error);
-      res.status(500).json({ success: false, message: 'Failed to process certification ID' });
+      res.json({ success: false, message: 'Failed to process certification ID' });
     }
   });
 
