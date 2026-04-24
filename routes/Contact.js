@@ -77,10 +77,10 @@ html = html
    
       .find()
       .sort({ createdAt: -1 })
-      res.status(200).json(allEnquiryData);
+      res.json(allEnquiryData);
     } catch (error) {
       console.error("Error fetching attendance data:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+      res.json({ error: "Internal Server Error" });
     }
   });
 
