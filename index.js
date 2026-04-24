@@ -25,6 +25,10 @@ app.use('/',Birthroute)
 app.use('/',Subscribe)
 app.use("/", completionRoutes);
 
+app.get("/", (req, res) => {
+  res.send("Welcome to V-Ex Tech Solution Backend");
+});
+
 
 
 
