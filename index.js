@@ -34,8 +34,10 @@ app.get("/", (req, res) => {
 
 
 
+
   // DB Connection
-mongoose.connect(process.env.MONGO_URI)
+
+mongoose.connect('mongodb+srv://veer2238rajput:STrgrNlEXyfMZHBs@cluster0.3chkue4.mongodb.net/Contact?retryWrites=true&w=majority')
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.log(err));
 
